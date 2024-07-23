@@ -135,7 +135,6 @@ class Proxy:
 
     @new_thread(f"{PLUGIN_ID}-player_pos")
     def player_pos(self, source: CommandSource, context: CommandContext, player: str):
-        player = source.player
         player_list = self.api.get_player_list()
         server = source.get_server()
         if player not in player_list:
