@@ -73,6 +73,7 @@ color : int | str
         if not result:
             return
         name, title, x, y, z, color, dimension = result.groups()
+        dimension = dimension.replace("-","_")
         return Waypoint((int(x), int(y), int(z)), dimension, name, title, color)
     
 
