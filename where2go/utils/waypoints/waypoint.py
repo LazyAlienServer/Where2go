@@ -69,7 +69,7 @@ color : int | str
 
     def transform_xaero_waypoint(content: str):
         # xaero-waypoint:NAME:TITLE:X:Y:Z:COLOR:false:0:DIMENSION
-        result = re.fullmatch("xaero-waypoint:(.+):(.+):(-?[0-9]+):(-?[0-9]+):(-?[0-9]+):([0-9]{0,2}):.+:Internal-(.+)-waypoints", content)
+        result = re.fullmatch("xaero-waypoint:(.+):(.+):(-?[0-9]+):(-?[0-9]+):(-?[0-9]+):([0-9]{0,2}):.+:Internal_(.+)_waypoints", content.replace("-","_"))
         if not result:
             return
         name, title, x, y, z, color, dimension = result.groups()
