@@ -1,4 +1,64 @@
-waypoints:
-  display:
-    show:
+where2go:
+
+  waypoints:
+    display:
       
+      pos:
+        overworld: §2主世界 §a[{x}, {y}, {z}§a]§f
+        the_nether: §4地狱 §c[{x}, {y}, {z}§c]§f
+        the_end: §d末地 §5[{x}, {y}, {z}§5]§f
+      hover_text:
+        xaero: 添加Xaero坐标点
+        temporary: 将临时坐标点添加至共享
+      
+      show: §e@§f {name}§r §7-§f
+      temporary: §e# §7(临时坐标点)§f{name}§r §7-§f
+      error: §4错误的坐标点
+      id: §eID§7:§f{id}
+  
+  command:
+    add:
+      success: "坐标点§a添加成功§f §eID§7:§f{id}"
+      fail:
+        waypoint_exist: §c已存在坐标相同的坐标点§f
+        waypoint_close: §c已存在距离接近的坐标点§f
+        forceadd: §7§n仍要添加
+    remove: 
+      success: 坐标点§c已移除
+      fail: §4无效的坐标点
+    list:
+      page_error: §4页码应为整数
+      page_outofindex: §4错误的页码范围
+      nodata: §c无数据
+      page: §7[ §f第 §b{current}§f/§b{total}§f 页 §7]
+      left: "§8----- "
+      right: " §8-----"
+      pre: "§3<<"
+      pre_prompt: 上一页
+      next: "§3>>"
+      next_prompt: 下一页
+      end_prompt: 已经到头了
+    search:
+      nodata: §c没有找到有关'{name}'的坐标点
+      title: 找到有关§b'{name}'§f的§b{count}§f个§e坐标点§f：
+    info:
+      nodata: §c无效的坐标点ID
+      show: |
+        §eID§7:§f{id}
+        §e{creator} §f创建于 §b{create_time}
+    player_pos:
+      nodata: 该玩家不存在
+      closest: "§b附近的坐标点 §f{distance}m "
+    fastsearch:
+      nodata: §c没有找到有关'{name}'的坐标点或玩家
+  
+  help:
+    wp: 功能强大的共享坐标点工具
+    add: 在§eXaero地图§f中§d分享坐标点§f后，插件自动识别，点击最右侧§a[+]§f即可添加
+    remove: 移除坐标点，鼠标悬浮在坐标点前的§e'@'§f上即可显示§e坐标点ID§f
+    list: 列出所有§e坐标点§f，按§3<<§f和§3>>§f翻页
+    search: 按名称搜索§e坐标点§f
+    info: 按§e坐标点ID§f查看该坐标点的详细信息
+    fastsearch: 聊天框输入§b{prompt}§f来快速搜索坐标点或玩家
+    here: 广播自己的位置
+    whereis: 查询某玩家的位置

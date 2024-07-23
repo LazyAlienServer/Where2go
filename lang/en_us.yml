@@ -1,0 +1,23 @@
+where2go:
+
+  waypoints:
+    display:
+      
+      pos:
+        overworld: §2主世界 §a[{x}, {y}, {z}]§f
+        the_nether: §c地狱 §4[{x}, {y}, {z}]§f
+        the_end: §d末地 §5[{x}, {y}, {z}]§f
+      hover_text:
+        xaero: 添加Xaero坐标点
+        temporary: 将临时坐标点添加至共享
+      
+      show: §e@§f §l{name}§r §7-§f
+      temporary: §e# §7(临时坐标点)§f§l{name}§r §7-§f
+      error: §c错误的坐标点
+  
+  command:
+    add:
+      success: "坐标点§a添加成功§f §eID§7:§f{id}"
+    remove: 
+      success: 坐标点§4已移除
+      fail: §4无效的坐标点

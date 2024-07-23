@@ -1,7 +1,7 @@
 {
-	"id": "to_where",
+	"id": "where2go",
 	"version": "0.1.0",
-	"name": "ToWhere",
+	"name": "Where2go",
 	"description": {
 		"en_us": "An advanced 'location' plugin including sharing waypoints, search player pos, etc.",
 		"zh_cn": "一个先进的位置插件，包含共享坐标点、查询玩家位置等功能"
@@ -12,5 +12,8 @@
 	"link": "https://github.com/LazyAlienServer/ToWhere",
 	"dependencies": {
 		"mcdreforged": ">=2.1.2"
-	}
+	},
+	"resources": [
+		"lang"
+	]
 }
