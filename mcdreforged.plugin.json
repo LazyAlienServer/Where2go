@@ -9,7 +9,7 @@
 	"author": [
 		"tanh_Heng"
 	],
-	"link": "https://github.com/LazyAlienServer/ToWhere",
+	"link": "https://github.com/LazyAlienServer/Where2go",
 	"dependencies": {
 		"mcdreforged": ">=2.6.0"
 	},
