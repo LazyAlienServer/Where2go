@@ -48,7 +48,7 @@ where2go:
         §e{creator} §f创建于 §b{create_time}
     player_pos:
       nodata: 该玩家不存在
-      closest: "§b附近的坐标点 §f{distance}m "
+      closest: "§b附近 §f{distance}m "
     fastsearch:
       nodata: §c没有找到有关'{name}'的坐标点或玩家
   
