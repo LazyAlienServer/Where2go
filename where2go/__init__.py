@@ -109,7 +109,7 @@ class Proxy:
             pre = pre.c(RAction.run_command, f"{self.prefix} list {page-1}")
         next = rtr("command.list.next").h(rtr(f"command.list.{'end' if page == total else 'next'}_prompt"))
         if page != total:
-            pre = pre.c(RAction.run_command, f"{self.prefix} list {page+1}")
+            next = next.c(RAction.run_command, f"{self.prefix} list {page+1}")
         source.reply(RTextList(rtr("command.list.left"), pre, rtr("command.list.page", current=page, total=total), next, rtr("command.list.right")))
     
 
@@ -154,7 +154,7 @@ class Proxy:
     def on_user_info(self, server: PluginServerInterface, info: Info):
         waypoint = Waypoint.transform_xaero_waypoint(info.content)
         if waypoint:
-            server.reply(info, Display.temporary(waypoint, self.config["command"]["waypoints"]))
+            server.say(Display.temporary(waypoint, self.config["command"]["waypoints"]))
             return
         fastsearch = re.match(self.config["command"]["fastsearch_regex"], info.content)
         if not fastsearch:
@@ -162,17 +162,17 @@ class Proxy:
         name = fastsearch.groups()[0]
         target = self.waypoint_manager.search_name(name)
         if target:
-            server.reply(info, rtr("command.search.title", name=name, count=len(target)))
+            server.say(rtr("command.search.title", name=name, count=len(target)))
             for i in target:
-                server.reply(info, Display.show(i["waypoint"], i["id"]))
+                server.say(Display.show(i["waypoint"], i["id"]))
             return
         player_list = self.api.get_player_list()
         if not player_list or name not in player_list:
-            server.reply(info, rtr("command.fastsearch.nodata", name=name))
+            server.say(rtr("command.fastsearch.nodata", name=name))
             return
         player_pos = self.api.get_player_pos(name)
         if not player_pos:
-            server.reply(info, rtr("command.fastsearch.nodata", name=name))
+            server.say(rtr("command.fastsearch.nodata", name=name))
             return
         waypoint = Waypoint(player_pos["pos"], player_pos["dimension"], name)
         server.say(Display.show(waypoint))

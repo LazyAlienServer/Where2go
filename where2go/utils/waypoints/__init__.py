@@ -89,7 +89,7 @@ class WaypointManager:
     
 
     def search_name(self, content: str) -> List[WaypointData]:
-        targets = [data for data in self.data if self.is_string_similar(data["waypoint"].name, content)]
+        targets = [data for data in self.data if self.is_string_similar(data["waypoint"].name, content) or content in data["waypoint"].name]
         return targets
     
 
