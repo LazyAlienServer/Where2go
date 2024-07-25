@@ -3,6 +3,7 @@ from typing import Any, Union
 from typing import TypedDict
 from mcdreforged.api.all import ServerInterface
 
+formatting_codes = "0123456789abcdef"
 
 class WaypointDict(TypedDict):
     pos: tuple
@@ -14,7 +15,7 @@ class WaypointDict(TypedDict):
 
 class Waypoint:
 
-    def __init__(self, pos: tuple, dimension: str, name: str, title: str = None, color: Union[int,str] = None) -> None:
+    def __init__(self, pos: tuple, dimension: str, name: str, title: str = None, color: Union[int, str] = None) -> None:
         '''Create a waypoint
 
 Parameters
@@ -38,10 +39,8 @@ color : int | str
         if not title:
             title = name[0] if len(name) > 0 else ""
         self.title: str = title
-        color = str(color)
-        formatting_codes = "0123456789abcdef"
-        if len(color) != 1 or color not in formatting_codes:
-            color = random.choice(formatting_codes)
+        if type(color) == int:
+            color = str(formatting_codes[color]) if color < len(formatting_codes) else random.choice(formatting_codes)
         self.color: str = color
     
 
@@ -74,11 +73,11 @@ color : int | str
             return
         name, title, x, y, z, color, dimension = result.groups()
         dimension = dimension.replace("-","_")
-        return Waypoint((int(x), int(y), int(z)), dimension, name, title, color)
+        return Waypoint((int(x), int(y), int(z)), dimension, name, title, int(color))
     
 
     def get_xaero_waypoint(self, dimensions_map = {"overworld": "Internal-overworld-waypoints", "the_nether": "Internal-the-nether-waypoints", "the_end": "Internal-the-end-waypoints"}):
-        return f"xaero-waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{self.color}:false:0:{dimensions_map[self.dimension]}"
+        return f"xaero-waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:{dimensions_map[self.dimension]}"
     
     def get_xaero_waypoint_add(self):
-        return f"xaero_waypoint_add:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{self.color}:false:0:Internal_{self.dimension}_waypoints"
+        return f"xaero_waypoint_add:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:Internal_{self.dimension}_waypoints"

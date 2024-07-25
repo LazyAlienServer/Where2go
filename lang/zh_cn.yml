@@ -6,7 +6,7 @@ where2go:
       pos:
         overworld: §2主世界 §a[{x}, {y}, {z}§a]§f
         the_nether: §4地狱 §c[{x}, {y}, {z}§c]§f
-        the_end: §d末地 §5[{x}, {y}, {z}§5]§f
+        the_end: §5末地 §d[{x}, {y}, {z}§d]§f
       hover_text:
         xaero: 添加Xaero坐标点
         temporary: 将临时坐标点添加至共享
