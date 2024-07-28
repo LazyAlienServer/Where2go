@@ -41,8 +41,10 @@ color : int | str
         self.title: str = title
         if type(color) == int:
             color = str(formatting_codes[color]) if color < len(formatting_codes) else random.choice(formatting_codes)
+        elif type(color) != str or color not in formatting_codes:
+            color = random.choice(formatting_codes)
         self.color: str = color
-    
+     
 
     def __eq__(self, __value: object) -> bool:
         return isinstance(__value, Waypoint) and self.pos == __value.pos

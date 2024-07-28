@@ -46,6 +46,11 @@ where2go:
       show: |
         §eID§7:§f{id}
         §e{creator} §f创建于 §b{create_time}
+        §e名称 §f{name}
+        §e标题 §f{title}
+        §e颜色 §{color}{color}
+        §e维度 §f{dimension}
+        §e坐标 §f{pos}
     player_pos:
       nodata: 该玩家不存在
       closest: "§b附近 §f{distance}m "
