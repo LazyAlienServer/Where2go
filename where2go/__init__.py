@@ -190,7 +190,6 @@ def on_load(server: PluginCommandSource, prev_module):
     proxy = Proxy(server)
 
 def on_user_info(server: PluginServerInterface, info: Info):
-    global proxy
     proxy.on_user_info(server, info)
 
 def on_info(server: PluginServerInterface, info: Info):
