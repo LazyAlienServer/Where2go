@@ -2,17 +2,7 @@ from mcdreforged.api.all import Info, ServerInterface
 from threading import Event
 from typing import TypedDict, List, Union
 import re
-
-
-class PlayerAPIConfig(TypedDict):
-    prefix_regex: str
-    player_pos_command: str
-    player_dimension_command: str
-    player_pos_regex: str
-    player_dimension_regex: str
-    player_list_command: str
-    player_list_sep: str
-    player_list_regex: str
+from where2go.config import PLAYER_API_CONFIG
 
 
 class PlayerPos(TypedDict):
@@ -22,7 +12,7 @@ class PlayerPos(TypedDict):
 
 class PlayerAPI:
 
-    def __init__(self, config: PlayerAPIConfig) -> None:
+    def __init__(self, config: PLAYER_API_CONFIG) -> None:
         self.player_pos: dict = {}
         self.player_list: dict = {}
         self.config = config
@@ -40,8 +30,8 @@ class PlayerAPI:
                 "dimension": None
             }
             server = ServerInterface.si()
-            server.execute(self.config["player_pos_command"].format(player=player))
-            server.execute(self.config["player_dimension_command"].format(player=player))
+            server.execute(self.config.player_pos_command.format(player=player))
+            server.execute(self.config.player_dimension_command.format(player=player))
         event.wait(timeout=timeout)
         pos = player_pos[player]
         player_pos.pop(player)
@@ -58,9 +48,9 @@ class PlayerAPI:
                 "list": None
             }
             event.clear()
-            ServerInterface.si().execute(self.config["player_list_command"])
+            ServerInterface.si().execute(self.config.player_list_command)
         event.wait(timeout=timeout)
-        result = [re.fullmatch(f"{self.config['prefix_regex']}(.+)", i).groups()[-1] for i in self.player_list["list"]] if self.player_list["list"] else None
+        result = [re.fullmatch(f"{self.config.prefix_regex}(.+)", i).groups()[-1] for i in self.player_list["list"]] if self.player_list["list"] else None
         self.player_list = {}
         return result
 
@@ -69,8 +59,8 @@ class PlayerAPI:
         if not info.is_from_server:
             return
         if self.player_pos:
-            pos = re.match(self.config["player_pos_regex"].format(prefix_regex = self.config["prefix_regex"]), info.content) 
-            dimension = re.match(self.config["player_dimension_regex"].format(prefix_regex = self.config["prefix_regex"]), info.content)
+            pos = re.match(self.config.player_pos_regex.format(prefix_regex = self.config.prefix_regex), info.content) 
+            dimension = re.match(self.config.player_dimension_regex.format(prefix_regex = self.config.prefix_regex), info.content)
             if not pos and not dimension:
                 return
             if pos:
@@ -90,7 +80,7 @@ class PlayerAPI:
                 if player_pos["pos"]:
                     player_pos["event"].set()
         if self.player_list:
-            player_list = re.match(self.config["player_list_regex"], info.content)
+            player_list = re.match(self.config.player_list_regex, info.content)
             if player_list:
-                self.player_list["list"] = player_list.groups()[-1].split(self.config["player_list_sep"])
+                self.player_list["list"] = player_list.groups()[-1].split(self.config.player_list_sep)
                 self.player_list["event"].set()

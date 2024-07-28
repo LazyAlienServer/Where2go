@@ -1,19 +1,20 @@
-from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor
+from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, PlayerCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor
 from where2go.utils.waypoints import WaypointManager, Waypoint, Display
 from where2go.utils.api import PlayerAPI
 from where2go.utils.display_utils import rtr, help_msg
-from where2go.constants import DEFAULT_CONFIG, PLUGIN_ID
+from where2go.constants import PLUGIN_ID
+from where2go.config import CONFIG
 import re
 
 
 class Proxy:
 
     def __init__(self, server: PluginServerInterface) -> None:
-        self.config = server.load_config_simple("config.json", default_config=DEFAULT_CONFIG)
-        self.waypoint_manager = WaypointManager(server)
-        self.api = PlayerAPI(self.config["player_api"])
+        self.config : CONFIG = server.load_config_simple("config.json", target_class=CONFIG)
+        self.waypoint_manager : WaypointManager = WaypointManager(server)
+        self.api = PlayerAPI(self.config.player_api)
 
-        prefix = self.config["command"]["waypoints"]
+        prefix = self.config.command.waypoints
         self.prefix = prefix
         builder = SimpleCommandBuilder()
         builder.command(f"{prefix}", self.help_msg) # wp help
@@ -33,10 +34,10 @@ class Proxy:
         builder.arg("name", Text) # wp search
         builder.command(f"{prefix} search", lambda source, context: source.reply(help_msg("search", prefix)))
         builder.command(f"{prefix} search <name>", self.search)
-        here_prefix = self.config['command']['here'] # here
+        here_prefix = self.config.command.here # here
         builder.command(f"{here_prefix}", lambda source, context: self.player_pos(source, context, source.player) if source.is_player else None)
         builder.arg("player", Text)
-        whereis_prefix = self.config['command']['whereis'] # vris
+        whereis_prefix = self.config.command.whereis # vris
         builder.command(f"{whereis_prefix}", lambda source, context: source.reply(RTextList(RText(f"§7{whereis_prefix} <player>").c(RAction.suggest_command, f"{whereis_prefix}"), " ", rtr(f"help.whereis"))))
         builder.command(f"{whereis_prefix} <player>", lambda source, context: self.player_pos(source, context, context["player"]))
         builder.register(server)
@@ -44,7 +45,8 @@ class Proxy:
         server.register_help_message(prefix, rtr("help.wp"))
         server.register_help_message(here_prefix, rtr("help.here"))
         server.register_help_message(whereis_prefix, rtr("help.whereis"))
-        server.register_help_message(self.config["command"]["fastsearch_prompt"], rtr("help.fastsearch", prompt=self.config["command"]["fastsearch_prompt"]))
+        fastsearch_prompt = self.config.command.fastsearch_prompt
+        server.register_help_message(fastsearch_prompt, rtr("help.fastsearch", prompt=fastsearch_prompt))
     
 
     def help_msg(self, source: CommandSource, context: CommandContext):
@@ -129,8 +131,7 @@ class Proxy:
         waypoint = self.waypoint_manager.search_id(id)
         if not waypoint:
             source.reply(rtr("command.info.nodata"))
-        source.reply(rtr("command.info.show", id=waypoint["id"], creator=waypoint["creator"], create_time=waypoint["create_time"]))
-        source.reply(Display.show(waypoint["waypoint"], waypoint["id"]))
+        source.reply(rtr("command.info.show", id=waypoint["id"], creator=waypoint["creator"], create_time=waypoint["create_time"], **waypoint["waypoint"].to_dict()))
     
 
     @new_thread(f"{PLUGIN_ID}-player_pos")
@@ -145,6 +146,7 @@ class Proxy:
         waypoint = Waypoint(player_pos["pos"], player_pos["dimension"], player)
         
         server.say(Display.show(waypoint))
+        source.get_server().execute(self.config.player_api.highlight_command.format(player=player))
         closest = self.waypoint_manager.search_closest(player_pos["pos"], player_pos["dimension"], 128)
         if closest:
             server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), Display.show(closest[0]["waypoint"], closest[0]["id"])))
@@ -154,9 +156,9 @@ class Proxy:
     def on_user_info(self, server: PluginServerInterface, info: Info):
         waypoint = Waypoint.transform_xaero_waypoint(info.content)
         if waypoint:
-            server.say(Display.temporary(waypoint, self.config["command"]["waypoints"]))
+            server.say(Display.temporary(waypoint, self.config.command.waypoints))
             return
-        fastsearch = re.match(self.config["command"]["fastsearch_regex"], info.content)
+        fastsearch = re.match(self.config.command.fastsearch_regex, info.content)
         if not fastsearch:
             return
         name = fastsearch.groups()[0]
@@ -176,6 +178,7 @@ class Proxy:
             return
         waypoint = Waypoint(player_pos["pos"], player_pos["dimension"], name)
         server.say(Display.show(waypoint))
+        server.execute(self.config.player_api.highlight_command.format(player=name))
         closest = self.waypoint_manager.search_closest(player_pos["pos"], player_pos["dimension"], 64)
         if closest:
             server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), Display.show(closest[0]["waypoint"])))
@@ -187,7 +190,6 @@ def on_load(server: PluginCommandSource, prev_module):
     proxy = Proxy(server)
 
 def on_user_info(server: PluginServerInterface, info: Info):
-    global proxy
     proxy.on_user_info(server, info)
 
 def on_info(server: PluginServerInterface, info: Info):
