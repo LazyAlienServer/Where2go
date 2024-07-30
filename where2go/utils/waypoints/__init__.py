@@ -74,10 +74,10 @@ class WaypointManager:
         return data
 
     
-    def remove(self, id: str) -> Union[False, WaypointData]:
+    def remove(self, id: str) -> Union[None, WaypointData]:
         data = self.search_id(id)
         if not data:
-            return False
+            return None
         self.data.remove(data)
         if self.save_everytime:
             self._save_data()
