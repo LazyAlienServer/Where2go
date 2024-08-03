@@ -8,57 +8,62 @@ where2go:
         the_nether: §4the_nether §c[{x}, {y}, {z}§c]§f
         the_end: §5the_end §d[{x}, {y}, {z}§d]§f
       hover_text:
-        xaero: add Xaero's waypoint
-        temporary: add temporary waypoint to sharing waypoints
+        xaero: Add Xaero's waypoint
+        temporary: Add a temporary waypoint to sharing waypoints
       
       show: §e@§f {name}§r §7-§f
       temporary: §e# §7(temporary)§f{name}§r §7-§f
-      error: §4wrong waypoint
-      id: §eID§7:§f{id}
+      error: §4Wrong Waypoint
+      id: "§eID§7: §f{id}"
   
   command:
     add:
       success: "§aSuccessfully add§f waypoint  §eID§7:§f{id}"
       fail:
-        waypoint_exist: §c已存在坐标相同的坐标点§f
-        waypoint_close: §c已存在距离接近的坐标点§f
-        forceadd: §7§n仍要添加
-    remove: 
-      success: 坐标点§c已移除
-      fail: §4无效的坐标点
+        waypoint_exist: §cA waypoint already existed here!§f
+        waypoint_close: §cA waypoint already existed near here!§f
+        forceadd: §7§nForce add?
+    remove:
+      success: Waypoint §cremoved!
+      fail: §4Invalid waypoint!
     list:
-      page_error: §4页码应为整数
-      page_outofindex: §4错误的页码范围
-      nodata: §c无数据
-      page: §7[ §f第 §b{current}§f/§b{total}§f 页 §7]
+      page_error: §4Page number should be a integer!
+      page_outofindex: §4The page number does not exist!
+      nodata: §cNo data
+      page: §7[ §fPage §b{current}§f/§b{total}§7 ]
       left: "§8----- "
       right: " §8-----"
       pre: "§3<<"
-      pre_prompt: 上一页
+      pre_prompt: Previous Page
       next: "§3>>"
-      next_prompt: 下一页
-      end_prompt: 已经到头了
+      next_prompt: Next Page
+      end_prompt: You've reached the end
     search:
-      nodata: §c没有找到有关'{name}'的坐标点
-      title: 找到有关§b'{name}'§f的§b{count}§f个§e坐标点§f：
+      nodata: §cCannot find any waypoints for '{name}'
+      title: "Found §b{count} §ewaypoint(s) §ffor §b'{name}'§f:"
     info:
-      nodata: §c无效的坐标点ID
+      nodata: §cInvalid Waypoint ID
       show: |
-        §eID§7:§f{id}
-        §e{creator} §f创建于 §b{create_time}
+        §eID§7: §f{id}
+        §e{creator} §fcreated at §b{create_time}
+        §eName §f{name}
+        §eTitle §f{title}
+        §eColot §{color}{color}
+        §eDimension §f{dimension}
+        §ePosition §f{pos}
     player_pos:
-      nodata: 该玩家不存在
-      closest: "§b附近 §f{distance}m "
+      nodata: This player does not exist!
+      closest: "§f{distance}m §baway"
     fastsearch:
-      nodata: §c没有找到有关'{name}'的坐标点或玩家
+      nodata: §cCannot find any wapoints and players for '{name}'
   
   help:
-    wp: 功能强大的共享坐标点工具
-    add: 在§eXaero地图§f中§d分享坐标点§f后，插件自动识别，点击最右侧§a[+]§f即可添加
-    remove: 移除坐标点，鼠标悬浮在坐标点前的§e'@'§f上即可显示§e坐标点ID§f
-    list: 列出所有§e坐标点§f，按§3<<§f和§3>>§f翻页
-    search: 按名称搜索§e坐标点§f
-    info: 按§e坐标点ID§f查看该坐标点的详细信息
-    fastsearch: 聊天框输入§b{prompt}§f来快速搜索坐标点或玩家
-    here: 广播自己的位置
-    whereis: 查询某玩家的位置
+    wp: A powerful tool for sharing coordinates
+    add: After you §dshared your wapoint §fin §eXaero's Map, this plugin will detect it automatically, click the §a[+]§f on the right to add this wapoint
+    remove: Remove the Wapoint, hover your cursor on §e'@'§f to show §ethe wapoint ID§f
+    list: List all §ewapoints§f, click §3<< §fand §3>>§f to turn to next page
+    search: Search §ewapoints§f by name
+    info: Query detailed info of wapoints using §ewapoint ID
+    fastsearch: Enter §b{prompt} §fin chat to quickly search for wapoints or players
+    here: Broadcast your location
+    whereis: Query a player's location
