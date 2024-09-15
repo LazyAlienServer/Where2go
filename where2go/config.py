@@ -4,7 +4,7 @@ class COMMAND_CONFIG(Serializable):
     waypoints: str = "!!wp"
     whereis: str = "!!vris"
     here: str = "!!here"
-    fastsearch_regex: str = "^(\w+)在哪？?"
+    fastsearch_regex: str = "^(\w+)在哪？?$"
     fastsearch_prompt: str = "XXX在哪"
 
 class PLAYER_API_CONFIG(Serializable):
