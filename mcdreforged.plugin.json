@@ -1,6 +1,6 @@
 {
 	"id": "where2go",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"name": "Where2go",
 	"description": {
 		"en_us": "An advanced 'location' plugin including sharing waypoints, search player pos, etc.",
