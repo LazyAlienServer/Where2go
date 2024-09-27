@@ -109,8 +109,10 @@ class WaypointManager:
     def search_closest(self, pos: tuple, dimension, max_distance: int = None) -> Union[None, Tuple[WaypointData, int]]:
         targets = [data for data in self.data if data["waypoint"].dimension == dimension]
         distance = [i["waypoint"].distance(pos) for i in targets]
+        if not distance:
+            return
         min_distance = min(distance)
-        return (targets[distance.index(min_distance)], min_distance) if max_distance == None or min_distance <= max_distance else None
+        return (targets[distance.index(min_distance)], min_distance) if max_distance is None or min_distance <= max_distance else None
 
     
     def is_string_similar(self, string1, string2, similarity = 0.5):
