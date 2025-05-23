@@ -82,4 +82,4 @@ color : int | str
         return f"xaero-waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:{dimensions_map[self.dimension]}"
     
     def get_xaero_waypoint_add(self):
-        return f"xaero_waypoint_add:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:Internal_{self.dimension}_waypoints"
+        return f"xaero_waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:Internal_{self.dimension}_waypoints"
