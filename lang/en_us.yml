@@ -25,6 +25,7 @@ where2go:
         waypoint_close: §cA waypoint already existed near here!§f
         forceadd: §7§nForce add?
         dimension_invalid: §cInvalid dimension§f
+        player_only: §cThis command can only be executed by a player.§f
     remove:
       success: Waypoint §cremoved!
       fail: §4Invalid waypoint!
@@ -64,6 +65,7 @@ where2go:
     add: After you §dshared your waypoint §fin §eXaero's Map, this plugin will detect it automatically, click the §a[+]§f on the right to add this wapoint
     forceadd: Forcibly add a waypoint
     addpos: Add waypoint from the input coordinates, where §edimension§f can be §do§f(overworld), §dn§f(the_nether) or §de§f(the_end)
+    addhere: Add your current location as a waypoint.
     remove: Remove the Waypoint, hover your cursor on §e'@'§f to show §ethe waypoint ID§f
     list: List all §ewaypoints§f, click §3<< §fand §3>>§f to turn to next page
     search: Search §ewaypoints§f by name

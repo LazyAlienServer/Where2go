@@ -10,6 +10,7 @@ help_dict = {
     "add": "<waypoint>",
     "forceadd": "<waypoint>",
     "addpos": "<pos_x> <pos_y> <pos_z> <dimension> <name>",
+    "addhere": "<name>",
     "remove": "<id>",
     "list": "[page]",
     "search": "<name>",

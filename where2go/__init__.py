@@ -1,7 +1,7 @@
 from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, PlayerCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor
 from where2go.utils.waypoints import WaypointManager, Waypoint, Display
 from where2go.utils.api import PlayerAPI
-from where2go.utils.display_utils import rtr, help_msg
+from where2go.utils.display_utils import rtr, help_msg, help_dict
 from where2go.constants import PLUGIN_ID
 from where2go.config import CONFIG
 import re
@@ -19,18 +19,22 @@ class Proxy:
         builder = SimpleCommandBuilder()
         builder.command(f"{prefix}", self.help_msg) # wp help
         builder.command(f"{prefix} help", self.help_msg)
+        for key in help_dict.keys():
+            builder.command(f"{prefix} {key}", lambda source, context: source.reply(help_msg(prefix, key)))
         builder.arg("waypoint", Text) # wp add
         builder.command(f"{prefix} add", lambda source, context: source.reply(help_msg("add", prefix)))
         builder.command(f"{prefix} add <waypoint>", self.add)
         builder.command(f"{prefix} forceadd", lambda source, context: source.reply(help_msg("forceadd", prefix)))
-        builder.command(f"{prefix} forceadd <waypoint>", lambda source, context: self.add(source, context, force=True))
+        builder.command(f"{prefix} forceadd <waypoint>", lambda source, context: self.add(source, context, force = True))
         builder.arg('pos_x', Integer) # wp addpos
         builder.arg('pos_y', Integer)
         builder.arg('pos_z', Integer)
         builder.arg('dimension', Text)
         builder.arg('name', Text)
         builder.command(f"{prefix} addpos", lambda source, context: source.reply(help_msg("addpos", prefix)))
-        builder.command(f"{prefix} addpos <pos_x> <pos_y> <pos_z> <dimension> <name>", lambda source, context: self.add(source, context, from_pos=True))
+        builder.command(f"{prefix} addpos <pos_x> <pos_y> <pos_z> <dimension> <name>", lambda source, context: self.add(source, context, from_pos = True))
+        builder.command(f"{prefix} addhere", lambda source, context: source.reply(help_msg("addhere", prefix)))
+        builder.command(f"{prefix} addhere <name>", lambda source, context: self.add(source, context, from_here = True))
         builder.arg("id", Text) # wp remove
         builder.command(f"{prefix} remove", lambda source, context: source.reply(help_msg("remove", prefix)))
         builder.command(f"{prefix} remove <id>", self.remove)
@@ -60,11 +64,11 @@ class Proxy:
     
 
     def help_msg(self, source: CommandSource, context: CommandContext):
-        for i in ["add", "forceadd", "addpos", "remove", "list", "search", "info"]:
-            source.reply(help_msg(i, self.prefix))
+        for key in help_dict.keys():
+            source.reply(help_msg(key, self.prefix))
 
-
-    def add(self, source: CommandSource, context: CommandContext, force=False, from_pos=False):
+    @new_thread(f"{PLUGIN_ID}-add")
+    def add(self, source: CommandSource, context: CommandContext, force=False, from_pos = False, from_here = False):
         if from_pos:
             DIMS = {"o": "overworld", "n": "the_nether", "e": "the_end"}
             dimension = context["dimension"]
@@ -72,13 +76,19 @@ class Proxy:
                 dimension = DIMS[dimension]
             else:
                 for dim in DIMS.values():
-                    if dim.endswith(dimension):
+                    if dim == dimension or dim == "minecraft:"+dimension:
                         dimension = dim
                         break
                 else:
                     source.reply(rtr("command.add.fail.dimension_invalid"))
                     return
             waypoint = Waypoint((context["pos_x"], context["pos_y"], context["pos_z"]), dimension, context["name"])
+        elif from_here:
+            if not source.is_player:
+                source.reply(rtr("command.add.fail.player_only"))
+                return
+            player_pos = self.api.get_player_pos(source.player)
+            waypoint = Waypoint(player_pos["pos"], player_pos["dimension"], context["name"])
         else:
             waypoint : Waypoint = Waypoint.transform_xaero_waypoint(context["waypoint"])
             if not waypoint:
@@ -92,7 +102,8 @@ class Proxy:
             return
         search = self.waypoint_manager.search_distance(waypoint.pos, waypoint.dimension, 32)
         if not force and search:
-            source.reply(RTextList(rtr("command.add.fail.waypoint_close"), " ", rtr("command.add.fail.forceadd").c(RAction.run_command, f"{self.prefix} forceadd {context['waypoint']}")))
+            forceadd_wp = context["waypoint"] if "waypoint" in context.keys() else waypoint.get_xaero_waypoint()
+            source.reply(RTextList(rtr("command.add.fail.waypoint_close"), " ", rtr("command.add.fail.forceadd").c(RAction.run_command, f"{self.prefix} forceadd {forceadd_wp}")))
             for i in search:
                 source.reply(RTextList("%.1fm "%waypoint.distance(i["waypoint"].pos), Display.show(i["waypoint"], i["id"])))
             return
