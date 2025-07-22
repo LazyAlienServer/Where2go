@@ -1,7 +1,15 @@
 # Where2go
 一个功能强大的位置插件，包含共享坐标点、查询玩家位置等功能
 
-需要`Python >= 3.10`
+# 依赖
+
+**Python**
+
+- `Python >= 3.10`
+
+**MCDR插件**
+
+- [MinecraftDataAPI](https://github.com/Fallen-Breath/MinecraftDataAPI)
 
 # 功能
 
@@ -12,6 +20,12 @@
 `!!wp add <xaero-waypoint>` 添加Xaero坐标点
 
 在Xaero地图中分享坐标点后，插件可**自动识别**。点击临时坐标点后方的`[+]`即可添加。若两个坐标点距离过近，插件会进行提示，以防重复添加。
+
+`!!wp addpos <x> <y> <z> <dimension> <name>` 
+
+添加名为`name`，坐标为`(x, y, z)`，位于`dimension`维度的坐标点。对于原版维度，`dimension`可以为`overworld` `the_nether` `the_end`或分别简写为`o` `n` `e`
+
+`!!wp addhere <name>` 将玩家当前位置添加为名为`name`的坐标点
 
 `!!wp remove <id>` 移除坐标点
 
