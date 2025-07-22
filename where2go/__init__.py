@@ -226,13 +226,5 @@ class Proxy:
             server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), Display.show(closest[0]["waypoint"])))
 
 
-
 def on_load(server: PluginCommandSource, prev_module):
-    global proxy
     proxy = Proxy(server)
-
-def on_user_info(server: PluginServerInterface, info: Info):
-    proxy.on_user_info(server, info)
-
-def on_info(server: PluginServerInterface, info: Info):
-    proxy.api.on_info(server, info)
