@@ -1,6 +1,6 @@
 {
 	"id": "where2go",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"name": "Where2go",
 	"description": {
 		"en_us": "An advanced 'location' plugin including sharing waypoints, search player pos, etc.",
@@ -11,7 +11,8 @@
 	],
 	"link": "https://github.com/LazyAlienServer/Where2go",
 	"dependencies": {
-		"mcdreforged": ">=2.6.0"
+		"mcdreforged": ">=2.6.0",
+		"minecraft_data_api": "*"
 	},
 	"resources": [
 		"lang",
