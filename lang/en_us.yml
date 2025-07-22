@@ -24,6 +24,7 @@ where2go:
         waypoint_exist: §cA waypoint already existed here!§f
         waypoint_close: §cA waypoint already existed near here!§f
         forceadd: §7§nForce add?
+        dimension_invalid: §cInvalid dimension§f
     remove:
       success: Waypoint §cremoved!
       fail: §4Invalid waypoint!
@@ -56,15 +57,17 @@ where2go:
       nodata: This player does not exist!
       closest: "§f{distance}m §baway"
     fastsearch:
-      nodata: §cCannot find any wapoints and players for '{name}'
+      nodata: §cCannot find any waypoints and players for '{name}'
   
   help:
     wp: A powerful tool for sharing coordinates
-    add: After you §dshared your wapoint §fin §eXaero's Map, this plugin will detect it automatically, click the §a[+]§f on the right to add this wapoint
-    remove: Remove the Wapoint, hover your cursor on §e'@'§f to show §ethe wapoint ID§f
-    list: List all §ewapoints§f, click §3<< §fand §3>>§f to turn to next page
-    search: Search §ewapoints§f by name
-    info: Query detailed info of wapoints using §ewapoint ID
-    fastsearch: Enter §b{prompt} §fin chat to quickly search for wapoints or players
+    add: After you §dshared your waypoint §fin §eXaero's Map, this plugin will detect it automatically, click the §a[+]§f on the right to add this wapoint
+    forceadd: Forcibly add a waypoint
+    addpos: Add waypoint from the input coordinates, where §edimension§f can be §do§f(overworld), §dn§f(the_nether) or §de§f(the_end)
+    remove: Remove the Waypoint, hover your cursor on §e'@'§f to show §ethe waypoint ID§f
+    list: List all §ewaypoints§f, click §3<< §fand §3>>§f to turn to next page
+    search: Search §ewaypoints§f by name
+    info: Query detailed info of waypoints using §ewaypoint ID
+    fastsearch: Enter §b{prompt} §fin chat to quickly search for waypoints or players
     here: Broadcast your location
     whereis: Query a player's location

@@ -24,6 +24,7 @@ where2go:
         waypoint_exist: §c已存在坐标相同的坐标点§f
         waypoint_close: §c已存在距离接近的坐标点§f
         forceadd: §7§n仍要添加
+        dimension_invalid: §c错误的维度§f
     remove: 
       success: 坐标点§c已移除
       fail: §4无效的坐标点
@@ -61,6 +62,8 @@ where2go:
   help:
     wp: 功能强大的共享坐标点工具
     add: 在§eXaero地图§f中§d分享坐标点§f后，插件自动识别，点击最右侧§a[+]§f即可添加
+    forceadd: 强制添加坐标点
+    addpos: 从输入坐标添加坐标点, 其中§edimension§f可以是§do§f（overworld，主世界）、§dn§f（the_nether，下界）或§de§f（the_end，末地）
     remove: 移除坐标点，鼠标悬浮在坐标点前的§e'@'§f上即可显示§e坐标点ID§f
     list: 列出所有§e坐标点§f，按§3<<§f和§3>>§f翻页
     search: 按名称搜索§e坐标点§f
