@@ -1,4 +1,4 @@
-from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, PlayerCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor
+from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, PlayerCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor, event_listener
 from where2go.utils.waypoints import WaypointManager, Waypoint, Display
 from where2go.utils.api import PlayerAPI
 from where2go.utils.display_utils import rtr, help_msg, help_dict
@@ -59,6 +59,7 @@ class Proxy:
         server.register_help_message(whereis_prefix, rtr("help.whereis"))
         fastsearch_prompt = self.config.command.fastsearch_prompt
         server.register_help_message(fastsearch_prompt, rtr("help.fastsearch", prompt=fastsearch_prompt))
+        server.register_event_listener("mcdr.user_info", self.on_user_info)
 
         Display._click_event_format = self.config.xaero.click_event_format
     
