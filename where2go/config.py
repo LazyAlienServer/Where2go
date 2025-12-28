@@ -14,6 +14,7 @@ class PLAYER_API_CONFIG(Serializable):
 
 class XAERO_CONFIG(Serializable):
     click_event_format: str = "simple"
+    enable_1_21_5_compat: bool = True
 
 class CONFIG(Serializable):
     xaero: XAERO_CONFIG = XAERO_CONFIG()

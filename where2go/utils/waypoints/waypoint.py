@@ -70,7 +70,7 @@ color : int | str
 
     def transform_xaero_waypoint(content: str):
         # xaero-waypoint:NAME:TITLE:X:Y:Z:COLOR:false:0:DIMENSION
-        result = re.fullmatch("xaero-waypoint:(.+):(.+):(-?[0-9]+):(-?[0-9]+):(-?[0-9]+):([0-9]{0,2}):.+:Internal-(.+)-waypoints", content)
+        result = re.fullmatch("xaero-waypoint:(.+):(.+):(-?[0-9]+):(-?[0-9]+):(-?[0-9]+):([0-9]{0,2}):.+:Internal-(.+?)(?:-waypoints)?", content)
         if not result:
             return
         name, title, x, y, z, color, dimension = result.groups()
@@ -78,7 +78,7 @@ color : int | str
         return Waypoint((int(x), int(y), int(z)), dimension, name, title, int(color))
     
 
-    def get_xaero_waypoint(self, dimensions_map = {"overworld": "Internal-overworld-waypoints", "the_nether": "Internal-the-nether-waypoints", "the_end": "Internal-the-end-waypoints"}):
+    def get_xaero_waypoint(self, dimensions_map = {"overworld": "Internal-overworld", "the_nether": "Internal-the-nether", "the_end": "Internal-the-end"}):
         return f"xaero-waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:{dimensions_map[self.dimension]}"
     
     def get_xaero_waypoint_add(self):

@@ -5,6 +5,7 @@ from where2go.utils.display_utils import rtr
 class Display:
 
     _click_event_format = "simple"
+    _enable_1_21_5_compat = True
 
     def transform(waypoint: Waypoint):
         x, y, z = waypoint.pos
@@ -35,10 +36,16 @@ class Display:
             case "simple":
                 return simple
             case "compatible":
-                return RTextList(RText("[", color=RColor.gold), 
-                                 RText("+X", color=RColor.gold).c(RAction.run_command, waypoint.get_xaero_waypoint_add()).h(rtr("waypoints.display.hover_text.xaero").set_color(RColor.gold)),
-                                 RText("#", color=RColor.yellow).c(RAction.run_command, waypoint.get_xaero_waypoint()).h(rtr("waypoints.display.hover_text.xaero_compatible").set_color(RColor.gold)),
-                                 RText("]", color=RColor.gold))
+                return RTextList(
+                    RText("[", color=RColor.gold), 
+                    RText("+X", color=RColor.gold).c(
+                        RAction.run_command, waypoint.get_xaero_waypoint_add()
+                    ).h(rtr("waypoints.display.hover_text.xaero").set_color(RColor.gold)),
+                    RText("#", color=RColor.yellow).c(
+                        RAction.suggest_command if Display._enable_1_21_5_compat else RAction.run_command,
+                                     waypoint.get_xaero_waypoint()
+                    ).h(rtr("waypoints.display.hover_text.xaero_compatible").set_color(RColor.gold)),
+                    RText("]", color=RColor.gold))
             case _:
                 return simple
 

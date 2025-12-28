@@ -62,6 +62,7 @@ class Proxy:
         server.register_event_listener("mcdr.user_info", self.on_user_info)
 
         Display._click_event_format = self.config.xaero.click_event_format
+        Display._enable_1_21_5_compat = self.config.xaero.enable_1_21_5_compat
     
 
     def help_msg(self, source: CommandSource, context: CommandContext):
