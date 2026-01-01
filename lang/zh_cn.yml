@@ -8,8 +8,9 @@ where2go:
         the_nether: §4地狱 §c[{x}, {y}, {z}§c]§f
         the_end: §5末地 §d[{x}, {y}, {z}§d]§f
       hover_text:
-        xaero: 添加Xaero坐标点
-        xaero_compatible: 添加Xaero坐标点§7(兼容模式)
+        xaero: §b添加Xaero坐标点
+        xaero_old: §7(Xaero's Minimap v24.x及以下版本)
+        xaero_new: §7(Xaero's Minimap v25.x及以上版本)
         temporary: 将临时坐标点添加至共享
       
       show: §e@§f {name}§r §7-§f

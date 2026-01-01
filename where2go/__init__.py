@@ -13,9 +13,13 @@ class Proxy:
         self.config : CONFIG = server.load_config_simple("config.json", target_class=CONFIG)
         self.waypoint_manager : WaypointManager = WaypointManager(server)
         self.api = PlayerAPI(self.config.player_api)
-
         prefix = self.config.command.waypoints
         self.prefix = prefix
+        self._register_commands(server, prefix)
+        Display.configure(self.config.xaero.click_event_format)
+    
+
+    def _register_commands(self, server: PluginServerInterface, prefix: str):
         builder = SimpleCommandBuilder()
         builder.command(f"{prefix}", self.help_msg) # wp help
         builder.command(f"{prefix} help", self.help_msg)
@@ -53,7 +57,6 @@ class Proxy:
         builder.command(f"{whereis_prefix}", lambda source, context: source.reply(RTextList(RText(f"§7{whereis_prefix} <player>").c(RAction.suggest_command, f"{whereis_prefix}"), " ", rtr(f"help.whereis"))))
         builder.command(f"{whereis_prefix} <player>", lambda source, context: self.player_pos(source, context, context["player"]))
         builder.register(server)
-
         server.register_help_message(prefix, rtr("help.wp"))
         server.register_help_message(here_prefix, rtr("help.here"))
         server.register_help_message(whereis_prefix, rtr("help.whereis"))
@@ -61,13 +64,11 @@ class Proxy:
         server.register_help_message(fastsearch_prompt, rtr("help.fastsearch", prompt=fastsearch_prompt))
         server.register_event_listener("mcdr.user_info", self.on_user_info)
 
-        Display._click_event_format = self.config.xaero.click_event_format
-        Display._enable_1_21_5_compat = self.config.xaero.enable_1_21_5_compat
-    
 
     def help_msg(self, source: CommandSource, context: CommandContext):
         for key in help_dict.keys():
             source.reply(help_msg(key, self.prefix))
+
 
     @new_thread(f"{PLUGIN_ID}-add")
     def add(self, source: CommandSource, context: CommandContext, force=False, from_pos = False, from_here = False):

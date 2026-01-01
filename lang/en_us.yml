@@ -8,8 +8,9 @@ where2go:
         the_nether: §4the_nether §c[{x}, {y}, {z}§c]§f
         the_end: §5the_end §d[{x}, {y}, {z}§d]§f
       hover_text:
-        xaero: Add Xaero's waypoint
-        xaero_compatible: Add Xaero's waypoint §7(compatible mode)
+        xaero: Add Xaero Waypoint
+        xaero_old: §7(Xaero's Minimap v24.x and below)
+        xaero_new: §7(Xaero's Minimap v25.x and above)
         temporary: Add a temporary waypoint to sharing waypoints
       
       show: §e@§f {name}§r §7-§f

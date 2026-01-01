@@ -2,8 +2,7 @@ import random, re
 from typing import Any, Union
 from typing import TypedDict
 from mcdreforged.api.all import ServerInterface
-
-formatting_codes = "0123456789abcdef"
+from where2go.utils.waypoints.constants import FORMATTING_CODES
 
 class WaypointDict(TypedDict):
     pos: tuple
@@ -40,9 +39,9 @@ color : int | str
             title = name[0] if len(name) > 0 else ""
         self.title: str = title
         if type(color) == int:
-            color = str(formatting_codes[color]) if color < len(formatting_codes) else random.choice(formatting_codes)
-        elif type(color) != str or color not in formatting_codes:
-            color = random.choice(formatting_codes)
+            color = str(FORMATTING_CODES[color]) if color < len(FORMATTING_CODES) else random.choice(FORMATTING_CODES)
+        elif type(color) != str or color not in FORMATTING_CODES:
+            color = random.choice(FORMATTING_CODES)
         self.color: str = color
      
 
@@ -79,7 +78,4 @@ color : int | str
     
 
     def get_xaero_waypoint(self, dimensions_map = {"overworld": "Internal-overworld", "the_nether": "Internal-the-nether", "the_end": "Internal-the-end"}):
-        return f"xaero-waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:{dimensions_map[self.dimension]}"
-    
-    def get_xaero_waypoint_add(self):
-        return f"xaero_waypoint_add:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{formatting_codes.index(self.color)}:false:0:Internal_{self.dimension}_waypoints"
+        return f"xaero-waypoint:{self.name}:{self.title}:{':'.join(map(str,self.pos))}:{FORMATTING_CODES.index(self.color)}:false:0:{dimensions_map[self.dimension]}"
