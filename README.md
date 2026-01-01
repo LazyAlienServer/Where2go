@@ -55,19 +55,13 @@
 
 ### xaero
 
-**click_event_format** `str`
+**click_event_format** `str`, `list`
 
 - 添加Xaero坐标点的按钮格式。可选：
-  + `"simple"`：样式为`[+X]`，简易模式，不支持**Xaero's Minimap v24.6.0及以上**的版本。
-  + `"compatible"`：样式为`[+X#]`，兼容模式。点击`+X`部分可以让旧版本Xaero直接添加坐标点，点击`#`部分可以通过玩家发送坐标点信息的方式，让客户端Xaero识别到坐标点分享信息，出现`[add]`按钮，点击`[add]`即可添加坐标点。
-
-**enable_1_21_5_compat** `bool`（默认：`true`）
-
-- 启用对 **Minecraft 1.21.5 及以上版本** 的兼容模式，避免添加坐标点的文本被 Minecraft 1.21.5+ 识别为聊天命令并被拦截。
-- 开启后：点击兼容模式下的 `#` 会把添加坐标点的文本填入聊天栏，玩家发送该消息后客户端会显示 `[add]` 按钮，玩家点击 `[add]` 即可添加坐标点。
-- 该配置项便于在需要时关闭兼容行为以回退到旧版交互方式。
-
-*我们暂不清楚Xaero's Minimap v24.6+中，玩家点击[添加]按钮后的行为是什么样的。如果你知晓新的行为，请通过issue反馈*
+  + `"old"`：样式为金色的`[+X]`，支持 Xaero's Minimap v24.x及以下版本。
+  + `"new"`：样式为黄色的`[+X]`，支持 Xaero's Minimap v25.x及以上的版本。
+  + 列表格式，如`["old", "new"]`，样式为`[+X]（金色） [+X]（黄色）`，点击前一个按钮可以使旧版Xaero添加坐标点，点击后一个按钮可以使新版Xaero添加坐标点。
+- **[注意]**：客户端请务必安装[LetMeClickAndSend](https://modrinth.com/mod/let-me-click-and-send)模组
 
 ### command
 
@@ -95,4 +89,4 @@
 # ToDo
 
 - [ ] 将主世界和地狱的两个坐标点进行关联
-- [ ] `!!wp add here/<player>`快速将玩家位置添加为坐标点
+- [x] `!!wp add here/<player>`快速将玩家位置添加为坐标点
