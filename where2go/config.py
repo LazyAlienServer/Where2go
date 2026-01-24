@@ -1,5 +1,5 @@
 from mcdreforged.api.all import Serializable
-from where2go.utils.waypoints.display import CLICK_EVENT_FORMAT
+from where2go.utils.waypoints.types import ClickEventFormat
 
 class COMMAND_CONFIG(Serializable):
     waypoints: str = "!!wp"
@@ -14,7 +14,7 @@ class PLAYER_API_CONFIG(Serializable):
     highlight_command: str = "effect give {player} minecraft:glowing 15 0 true"
 
 class XAERO_CONFIG(Serializable):
-    click_event_format: CLICK_EVENT_FORMAT = ["old", "new"]
+    click_event_format: ClickEventFormat = ["old", "new"]
 
 class CONFIG(Serializable):
     xaero: XAERO_CONFIG = XAERO_CONFIG()

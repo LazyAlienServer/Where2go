@@ -1,5 +1,6 @@
 from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, PlayerCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor, event_listener
-from where2go.utils.waypoints import WaypointManager, Waypoint, Display
+from where2go.utils.waypoints import WaypointManager, Waypoint
+from where2go.utils.waypoints.rtext_utils import RTextWaypoint, RTextWaypointError
 from where2go.utils.api import PlayerAPI
 from where2go.utils.display_utils import rtr, help_msg, help_dict
 from where2go.constants import PLUGIN_ID
@@ -16,7 +17,7 @@ class Proxy:
         prefix = self.config.command.waypoints
         self.prefix = prefix
         self._register_commands(server, prefix)
-        Display.configure(self.config.xaero.click_event_format)
+        RTextWaypoint.configure(prefix, self.config.xaero.click_event_format)
     
 
     def _register_commands(self, server: PluginServerInterface, prefix: str):
@@ -95,32 +96,32 @@ class Proxy:
         else:
             waypoint : Waypoint = Waypoint.transform_xaero_waypoint(context["waypoint"])
             if not waypoint:
-                source.reply(Display.waypoint_error())
+                source.reply(RTextWaypointError())
                 return
         search = self.waypoint_manager.search_distance(waypoint.pos, waypoint.dimension, 0)
         if search:
             search = search[0]
             source.reply(rtr("command.add.fail.waypoint_exist"))
-            source.reply(Display.show(search["waypoint"], search["id"]))
+            source.reply(RTextWaypoint(search["waypoint"], id=search["id"]))
             return
         search = self.waypoint_manager.search_distance(waypoint.pos, waypoint.dimension, 32)
         if not force and search:
             forceadd_wp = context["waypoint"] if "waypoint" in context.keys() else waypoint.get_xaero_waypoint()
             source.reply(RTextList(rtr("command.add.fail.waypoint_close"), " ", rtr("command.add.fail.forceadd").c(RAction.run_command, f"{self.prefix} forceadd {forceadd_wp}")))
             for i in search:
-                source.reply(RTextList("%.1fm "%waypoint.distance(i["waypoint"].pos), Display.show(i["waypoint"], i["id"])))
+                source.reply(RTextList("%.1fm "%waypoint.distance(i["waypoint"].pos), RTextWaypoint(i["waypoint"], id=i["id"])))
             return
         creater = source.player if source.is_player else "[Server]"
         data = self.waypoint_manager.add(creater, waypoint)
         source.reply(rtr("command.add.success", id=data["id"]))
-        source.reply(Display.show(waypoint, data["id"]))
+        source.reply(RTextWaypoint(waypoint, id=data["id"]))
             
     
     def remove(self, source: CommandSource, context: CommandContext):
         waypoint = self.waypoint_manager.remove(context["id"])
         if waypoint:
             source.reply(rtr("command.remove.success"))
-            source.reply(Display.show(waypoint["waypoint"]))
+            source.reply(RTextWaypoint(waypoint["waypoint"]))
         else:
             source.reply(rtr("command.remove.fail"))
     
@@ -144,7 +145,7 @@ class Proxy:
             source.reply(rtr("command.list.page_outofindex"))
             return
         for i in data[(page-1)*5:min(len(data), page*5)]:
-            source.reply(Display.show(i["waypoint"], i["id"]))
+            source.reply(RTextWaypoint(i["waypoint"], id=i["id"]))
         pre = rtr("command.list.pre").h(rtr(f"command.list.{'end' if page == 1 else 'pre'}_prompt"))
         if page != 1:
             pre = pre.c(RAction.run_command, f"{self.prefix} list {page-1}")
@@ -162,7 +163,7 @@ class Proxy:
             return
         source.reply(rtr("command.search.title", name=name, count=len(target)))
         for i in target:
-            source.reply(Display.show(i["waypoint"], i["id"]))
+            source.reply(RTextWaypoint(i["waypoint"], id=i["id"]))
     
 
     def info(self, source: CommandSource, context: CommandContext):
@@ -184,11 +185,11 @@ class Proxy:
             return
         waypoint = Waypoint(player_pos["pos"], player_pos["dimension"], player)
         
-        server.say(Display.show(waypoint))
+        server.say(RTextWaypoint(waypoint))
         source.get_server().execute(self.config.player_api.highlight_command.format(player=player))
         closest = self.waypoint_manager.search_closest(player_pos["pos"], player_pos["dimension"], 128)
         if closest:
-            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), Display.show(closest[0]["waypoint"], closest[0]["id"])))
+            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), RTextWaypoint(closest[0]["waypoint"], id=closest[0]["id"])))
 
 
     @new_thread(f"{PLUGIN_ID}-on_user_info")
@@ -197,10 +198,10 @@ class Proxy:
         if waypoint:
             search = self.waypoint_manager.search_distance(waypoint.pos, waypoint.dimension, 0)
             if not search:
-                server.say(Display.temporary(waypoint, self.config.command.waypoints))
+                server.say(RTextWaypoint(waypoint, is_temporary=True))
                 return
             search = search[0]
-            server.say(Display.show(search["waypoint"], search["id"]))
+            server.say(RTextWaypoint(search["waypoint"], id=search["id"]))
             return
             
         fastsearch = re.match(self.config.command.fastsearch_regex, info.content)
@@ -211,7 +212,7 @@ class Proxy:
         if target:
             server.say(rtr("command.search.title", name=name, count=len(target)))
             for i in target:
-                server.say(Display.show(i["waypoint"], i["id"]))
+                server.say(RTextWaypoint(i["waypoint"], id=i["id"]))
             return
         player_list = self.api.get_player_list()
         if not player_list or name not in player_list:
@@ -222,11 +223,11 @@ class Proxy:
             server.say(rtr("command.fastsearch.nodata", name=name))
             return
         waypoint = Waypoint(player_pos["pos"], player_pos["dimension"], name)
-        server.say(Display.show(waypoint))
+        server.say(RTextWaypoint(waypoint))
         server.execute(self.config.player_api.highlight_command.format(player=name))
         closest = self.waypoint_manager.search_closest(player_pos["pos"], player_pos["dimension"], 64)
         if closest:
-            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), Display.show(closest[0]["waypoint"])))
+            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), RTextWaypoint(closest[0]["waypoint"])))
 
 
 def on_load(server: PluginCommandSource, prev_module):

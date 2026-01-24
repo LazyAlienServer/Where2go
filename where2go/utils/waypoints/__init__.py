@@ -4,6 +4,7 @@ from typing import List, Union, Tuple
 import time, datetime, difflib, os, json
 from copy import deepcopy
 from where2go.utils.waypoints.types import WaypointData
+from where2go.utils.waypoints.rtext_utils import RTextWaypoint, RTextWaypointError 
 
 
 class WaypointManager:
