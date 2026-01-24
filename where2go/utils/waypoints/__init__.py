@@ -1,17 +1,9 @@
 from .waypoint import Waypoint
-from .display import Display
 from mcdreforged.api.all import PluginServerInterface
-from typing import TypedDict, List, Union, Tuple
+from typing import List, Union, Tuple
 import time, datetime, difflib, os, json
-from where2go.constants import PLUGIN_ID
 from copy import deepcopy
-
-
-class WaypointData(TypedDict):
-    id: str
-    create_time: str
-    creator: str
-    waypoint: Waypoint
+from where2go.utils.waypoints.types import WaypointData
 
 
 class WaypointManager:
@@ -84,6 +76,18 @@ class WaypointManager:
         return data
     
 
+    def link(self, id1: str, id2: str) -> Union[None, Tuple[WaypointData, WaypointData]]:
+        index1 = self.search_index(id1)
+        index2 = self.search_index(id2)
+        if not index1 or not index2:
+            return None
+        self.data[index1]["link"] = id2
+        self.data[index2]["link"] = id1
+        if self.save_everytime:
+            self._save_data()
+        return (self.data[index1], self.data[index2])
+    
+
     def save(self):
         self._save_data()
     
@@ -97,6 +101,13 @@ class WaypointManager:
         targets = [data for data in self.data if data["waypoint"].dimension == dimension and data["waypoint"].is_close_to(pos, distance)]
         return targets
     
+
+    def search_index(self, id: str) -> Union[None, int]:
+        id_list = [data["id"] for data in self.data]
+        if id not in id_list:
+            return None
+        return id_list.index(id)
+
 
     def search_id(self, id: str) -> Union[None, WaypointData]:
         id_list = [data["id"] for data in self.data]
