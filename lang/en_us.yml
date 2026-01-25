@@ -12,11 +12,12 @@ where2go:
         xaero_old: §7(Xaero's Minimap v24.x and below)
         xaero_new: §7(Xaero's Minimap v25.x and above)
         temporary: Add a temporary waypoint to sharing waypoints
-      
-      show: §e@§f {name}§r §7-§f
-      temporary: §e# §7(temporary)§f{name}§r §7-§f
+        link: §bLink waypoints §eID§7:§f{id} §b⇆ §eID§7:§f{target_id}
+      default_title: §e@§f
+      temporary: §e# §7(temporary)§f
       error: §4Wrong Waypoint
-      id: "§eID§7: §f{id}"
+      id: "§eID§7:§f{id}"
+      link: §eID§7:§f{id} §b⇆ §eID§7:§f{target_id}
   
   command:
     add:
@@ -29,19 +30,19 @@ where2go:
         player_only: §cThis command can only be executed by a player.§f
     remove:
       success: Waypoint §cremoved!
-      fail: §4Invalid waypoint!
-    list:
-      page_error: §4Page number should be a integer!
-      page_outofindex: §4The page number does not exist!
-      nodata: §cNo data
-      page: §7[ §fPage §b{current}§f/§b{total}§7 ]
-      left: "§8----- "
-      right: " §8-----"
-      pre: "§3<<"
-      pre_prompt: Previous Page
-      next: "§3>>"
-      next_prompt: Next Page
-      end_prompt: You've reached the end
+      fail: §4Invalid waypoint
+    link:
+      success: "§aSuccessfully linked§f waypoint §eID§7:§f{id} §b⇆ §eID§7:§f{target_id} §e↓"
+      fail:
+        waypoint_notexist: §4Invalid waypoint ID§f
+        waypoint_alreadylink: §cThis waypoint is already linked §e↓§f
+        waypoint_alreadylink_detail: "§eID§7:§f{id} §b⇆ §eID§7:§f{target_id}"
+    unlink:
+      success: "§aSuccessfully unlinked§f waypoint §eID§7:§f{id} §c-X- §eID§7:§f{target_id} §e↓"
+      fail:
+        waypoint_notexist: §4Invalid waypoint ID§f
+        waypoint_notlinked: §cThis waypoint is not linked§f
+        unavailable_link: §cThe linked waypoint is unavailable, unlinked successfully§f
     search:
       nodata: §cCannot find any waypoints for '{name}'
       title: "Found §b{count} §ewaypoint(s) §ffor §b'{name}'§f:"
@@ -68,9 +69,25 @@ where2go:
     addpos: Add waypoint from the input coordinates, where §edimension§f can be §do§f(overworld), §dn§f(the_nether) or §de§f(the_end)
     addhere: Add your current location as a waypoint.
     remove: Remove the Waypoint, hover your cursor on §e'@'§f to show §ethe waypoint ID§f
+    link: Establish a §bconnection§f between two waypoints to easily jump between them when viewing waypoint information
+    unlink: Break the §bconnection§f between two waypoints
+    autolink: Automatically find suitable connections for all unlinked waypoints
     list: List all §ewaypoints§f, click §3<< §fand §3>>§f to turn to next page
     search: Search §ewaypoints§f by name
     info: Query detailed info of waypoints using §ewaypoint ID
+  page:
+    page_error: §4Page number should be an integer!
+    page_outofindex: §4The page number does not exist!
+    nodata: §cNo data
+    page: §7[ §fPage §b{current}§f/§b{total}§7 ]
+    left: "§8----- "
+    right: " §8-----"
+    pre: "§3<<"
+    pre_prompt: Previous Page
+    next: "§3>>"
+    next_prompt: Next Page
+    end_prompt: You've reached the end
+  
     fastsearch: Enter §b{prompt} §fin chat to quickly search for waypoints or players
     here: Broadcast your location
     whereis: Query a player's location

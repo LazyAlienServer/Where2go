@@ -1,6 +1,7 @@
 from mcdreforged.api.all import PluginServerInterface, PluginCommandSource, PlayerCommandSource, CommandSource, CommandContext, Info, new_thread, SimpleCommandBuilder, Text, Integer, RText, RTextList, RAction, RColor, event_listener
-from where2go.utils.waypoints import WaypointManager, Waypoint
-from where2go.utils.waypoints.rtext_utils import RTextWaypoint, RTextWaypointError
+from where2go.utils.waypoints import WaypointManager, Waypoint, RTextWaypoint, RTextWaypointError, RTextWaypointSimple
+from where2go.utils.page_utils import Page
+from where2go.utils.waypoints.types import WaypointData
 from where2go.utils.api import PlayerAPI
 from where2go.utils.display_utils import rtr, help_msg, help_dict
 from where2go.constants import PLUGIN_ID
@@ -43,11 +44,18 @@ class Proxy:
         builder.arg("id", Text) # wp remove
         builder.command(f"{prefix} remove", lambda source, context: source.reply(help_msg("remove", prefix)))
         builder.command(f"{prefix} remove <id>", self.remove)
+        builder.arg("target_id", Text) # wp link
+        builder.command(f"{prefix} link", lambda source, context: source.reply(help_msg("link", prefix)))
+        builder.command(f"{prefix} link <id> <target_id>", self.link)
+        builder.command(f"{prefix} unlink", lambda source, context: source.reply(help_msg("unlink", prefix)))
+        builder.command(f"{prefix} unlink <id>", self.unlink)
         builder.command(f"{prefix} info", lambda source, context: source.reply(help_msg("info", prefix)))
         builder.command(f"{prefix} info <id>", self.info)
         builder.arg("page", Text) # wp list
         builder.command(f"{prefix} list", self.list)
         builder.command(f"{prefix} list <page>", self.list)
+        builder.command(f"{prefix} autolink", self.autolink) # wp autolink
+        builder.command(f"{prefix} autolink <page>", self.autolink)
         builder.arg("name", Text) # wp search
         builder.command(f"{prefix} search", lambda source, context: source.reply(help_msg("search", prefix)))
         builder.command(f"{prefix} search <name>", self.search)
@@ -102,7 +110,7 @@ class Proxy:
         if search:
             search = search[0]
             source.reply(rtr("command.add.fail.waypoint_exist"))
-            source.reply(RTextWaypoint(search["waypoint"], id=search["id"]))
+            source.reply(RTextWaypointSimple(search, self.waypoint_manager.get_linked_waypoint_data(search)))
             return
         search = self.waypoint_manager.search_distance(waypoint.pos, waypoint.dimension, 32)
         if not force and search:
@@ -114,45 +122,87 @@ class Proxy:
         creater = source.player if source.is_player else "[Server]"
         data = self.waypoint_manager.add(creater, waypoint)
         source.reply(rtr("command.add.success", id=data["id"]))
-        source.reply(RTextWaypoint(waypoint, id=data["id"]))
+        source.reply(RTextWaypointSimple(data)) # A new waypoint won't have a link yet
             
     
     def remove(self, source: CommandSource, context: CommandContext):
         waypoint = self.waypoint_manager.remove(context["id"])
         if waypoint:
             source.reply(rtr("command.remove.success"))
-            source.reply(RTextWaypoint(waypoint["waypoint"]))
+            source.reply(RTextWaypoint(waypoint["waypoint"])) # Removed waypoint won't have an ID and wont't need to show its link
         else:
             source.reply(rtr("command.remove.fail"))
     
 
+    def link(self, source: CommandSource, context: CommandContext):
+        id = context["id"]
+        target_id = context["target_id"]
+        result = self.waypoint_manager.link(id, target_id)
+        if not result:
+            source.reply(rtr("command.link.fail.waypoint_notexist"))
+            return
+        if isinstance(result[0], str) or isinstance(result[1], str):
+            source.reply(rtr("command.link.fail.waypoint_alreadylink"))
+            if result[0]:
+                source.reply(rtr("command.link.fail.waypoint_alreadylink_detail", id=id, target_id=result[0]))
+            if result[1] and result[1] != id:
+                source.reply(rtr("command.link.fail.waypoint_alreadylink_detail", id=target_id, target_id=result[1]))
+            return
+        source.reply(rtr("command.link.success", id=id, target_id=target_id))
+        source.reply(RTextWaypointSimple(result[0], linked_waypoint_data=result[1]))
+    
+
+    def unlink(self, source: CommandSource, context: CommandContext):
+        id = context["id"]
+        result = self.waypoint_manager.unlink(id)
+        if result is None:
+            source.reply(rtr("command.unlink.fail.waypoint_notexist"))
+            return
+        if result is False:
+            source.reply(rtr("command.unlink.fail.waypoint_notlinked"))
+            return
+        if not result[1]:
+            source.reply(rtr("command.unlink.fail.unavailable_link"))
+            return
+        source.reply(rtr("command.unlink.success", id=id, target_id=result[1]["id"]))
+        for i in result:
+            if i:
+                source.reply(RTextWaypointSimple(i))
+    
+
+    def autolink(self, source: CommandSource, context: CommandContext):
+        mapper = self.waypoint_manager.search_portal_candidates()
+        items = [(id, target_id) for id, candidates in mapper.items() for target_id in candidates]
+        page_util = Page(items, self.config.command.page_size, self.prefix+" autolink")
+        valid = page_util.set_page_index(context)
+        if not valid:
+            source.reply(page_util.get_rtext())
+            return
+        items_on_page = page_util.get_items_on_page()
+        for id, target_waypoint in items_on_page:
+            source.reply(
+                RTextWaypoint(
+                    self.waypoint_manager.search_id(id)["waypoint"],
+                    id=id,
+                    linked_id=target_waypoint["id"],
+                    has_xaero_button=False,
+                    has_link_button=True,
+                    linked_waypoint_parameter=target_waypoint["waypoint"]
+                )
+            )
+        source.reply(page_util.get_rtext())
+
+
     def list(self, source: CommandSource, context: CommandContext):
-        if "page" in context.keys():
-            page = context["page"]
-            if not re.fullmatch("[0-9]+", page):
-                source.reply(rtr("command.list.page_error"))
-                return
-            page = int(page)
-        else:
-            page = 1
-        page = int(page)
-        data = self.waypoint_manager.data
-        total = (len(data)+4)//5
-        if total == 0:
-            source.reply(rtr("command.list.nodata"))
+        page_util = Page(self.waypoint_manager.filter_linked_waypoints(self.waypoint_manager.data), self.config.command.page_size, self.prefix+" list")
+        valid = page_util.set_page_index(context)
+        if not valid:
+            source.reply(page_util.get_rtext())
             return
-        if page < 1 or page > total:
-            source.reply(rtr("command.list.page_outofindex"))
-            return
-        for i in data[(page-1)*5:min(len(data), page*5)]:
-            source.reply(RTextWaypoint(i["waypoint"], id=i["id"]))
-        pre = rtr("command.list.pre").h(rtr(f"command.list.{'end' if page == 1 else 'pre'}_prompt"))
-        if page != 1:
-            pre = pre.c(RAction.run_command, f"{self.prefix} list {page-1}")
-        next = rtr("command.list.next").h(rtr(f"command.list.{'end' if page == total else 'next'}_prompt"))
-        if page != total:
-            next = next.c(RAction.run_command, f"{self.prefix} list {page+1}")
-        source.reply(RTextList(rtr("command.list.left"), pre, rtr("command.list.page", current=page, total=total), next, rtr("command.list.right")))
+        items_on_page = page_util.get_items_on_page()
+        for i in items_on_page:
+            source.reply(RTextWaypointSimple(i, self.waypoint_manager.get_linked_waypoint_data(i)))
+        source.reply(page_util.get_rtext())
     
 
     def search(self, source: CommandSource, context: CommandContext):
@@ -163,7 +213,7 @@ class Proxy:
             return
         source.reply(rtr("command.search.title", name=name, count=len(target)))
         for i in target:
-            source.reply(RTextWaypoint(i["waypoint"], id=i["id"]))
+            source.reply(RTextWaypointSimple(i, self.waypoint_manager.get_linked_waypoint_data(i)))
     
 
     def info(self, source: CommandSource, context: CommandContext):
@@ -171,6 +221,7 @@ class Proxy:
         waypoint = self.waypoint_manager.search_id(id)
         if not waypoint:
             source.reply(rtr("command.info.nodata"))
+            return
         source.reply(rtr("command.info.show", id=waypoint["id"], creator=waypoint["creator"], create_time=waypoint["create_time"], **waypoint["waypoint"].to_dict()))
     
 
@@ -189,7 +240,7 @@ class Proxy:
         source.get_server().execute(self.config.player_api.highlight_command.format(player=player))
         closest = self.waypoint_manager.search_closest(player_pos["pos"], player_pos["dimension"], 128)
         if closest:
-            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), RTextWaypoint(closest[0]["waypoint"], id=closest[0]["id"])))
+            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), RTextWaypointSimple(closest[0], self.waypoint_manager.get_linked_waypoint_data(closest[0]))))
 
 
     @new_thread(f"{PLUGIN_ID}-on_user_info")
@@ -201,7 +252,7 @@ class Proxy:
                 server.say(RTextWaypoint(waypoint, is_temporary=True))
                 return
             search = search[0]
-            server.say(RTextWaypoint(search["waypoint"], id=search["id"]))
+            server.say(RTextWaypointSimple(search, self.waypoint_manager.get_linked_waypoint_data(search)))
             return
             
         fastsearch = re.match(self.config.command.fastsearch_regex, info.content)
@@ -212,7 +263,7 @@ class Proxy:
         if target:
             server.say(rtr("command.search.title", name=name, count=len(target)))
             for i in target:
-                server.say(RTextWaypoint(i["waypoint"], id=i["id"]))
+                server.say(RTextWaypointSimple(i, self.waypoint_manager.get_linked_waypoint_data(i)))
             return
         player_list = self.api.get_player_list()
         if not player_list or name not in player_list:
@@ -227,7 +278,7 @@ class Proxy:
         server.execute(self.config.player_api.highlight_command.format(player=name))
         closest = self.waypoint_manager.search_closest(player_pos["pos"], player_pos["dimension"], 64)
         if closest:
-            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), RTextWaypoint(closest[0]["waypoint"])))
+            server.say(RTextList(rtr("command.player_pos.closest", distance="%.1f"%closest[1]), RTextWaypointSimple(closest[0], self.waypoint_manager.get_linked_waypoint_data(closest[0]))))
 
 
 def on_load(server: PluginCommandSource, prev_module):

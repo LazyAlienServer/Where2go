@@ -7,6 +7,7 @@ class COMMAND_CONFIG(Serializable):
     here: str = "!!here"
     fastsearch_regex: str = "^(?P<name>\w+)在哪里?？?$"
     fastsearch_prompt: str = "XXX在哪"
+    page_size: int = 5
 
 class PLAYER_API_CONFIG(Serializable):
     prefix_regex: str = "(?:\[.+\])?"
